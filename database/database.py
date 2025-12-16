@@ -24,7 +24,7 @@ def init_db():
         )
         """)
 
-def save(vac: JustJoinItVacancy):
+def save_data(vac: JustJoinItVacancy):
     with _conn() as c:
         c.execute("""
         INSERT OR IGNORE INTO vacancies
@@ -42,6 +42,6 @@ def save(vac: JustJoinItVacancy):
             vac.description
         ))
 
-def exists(link: str) -> bool:
+def data_exists(link: str) -> bool:
     with _conn() as c:
         return c.execute("SELECT 1 FROM vacancies WHERE link=? LIMIT 1", (link,)).fetchone() is not None

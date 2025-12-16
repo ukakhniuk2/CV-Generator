@@ -11,3 +11,4 @@ class JustJoinItVacancy:
     is_remote: bool
     is_one_click: bool
     description: str | None
+    cv_code: str | None

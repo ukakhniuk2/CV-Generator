@@ -28,7 +28,8 @@ def parse_JustJoinIt(url):
             cards = list(dict.fromkeys([skill.text.strip() for skill in card.find_all('div', class_='mui-jikuwi') if skill.text.strip()])),
             is_remote = remote_badge is not None,
             is_one_click = '1-click Apply' in list(dict.fromkeys([skill.text.strip() for skill in card.find_all('div', class_='mui-jikuwi') if skill.text.strip()])),
-            description = None
+            description = None,
+            cv_code = None
         )
         jobs.append(job)
     return jobs
