@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: bot7
+Version: 0.1.0
+Summary: Bot7
+Author: Uladzislau Kakhniuk
+Requires-Python: >=3.12.3
+Requires-Dist: requests
+Requires-Dist: beautifulsoup4
+Requires-Dist: pyyaml
