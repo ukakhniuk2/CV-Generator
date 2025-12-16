@@ -1,2 +1,4 @@
 collector/__pycache__
 app/__pycache__
+venv
+generator/.env

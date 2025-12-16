@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Bot7"
 authors = [{ name = "Uladzislau Kakhniuk" }]
 requires-python = ">=3.12.3"
-dependencies = ["requests", "beautifulsoup4", "pyyaml"]
+dependencies = ["requests", "beautifulsoup4", "pyyaml", "openai"]
 
 [project.scripts]
 app = "app.app:main"
@@ -15,5 +15,5 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["app", "app.*", "collector", "collector.*"]
+include = ["app", "app.*", "collector", "collector.*", "generator", "generator.*"]
 namespaces = false
