@@ -2,6 +2,7 @@ from collector.parser import parse_JustJoinIt, parse_JustJoinIt_vacancy_descript
 from dataclasses import asdict
 import requests
 import json
+import os
 from generator.generator import ask_openai
 from database.database import init_db, save_data, data_exists
 
@@ -21,7 +22,8 @@ for job in jobs:
 
         # Send notification to Discord Bot
         try:
-            requests.post("http://localhost:8000/notify", json=asdict(job))
+            bot_url = os.getenv("BOT_URL")
+            requests.post(f"{bot_url}/notify", json=asdict(job))
             print(f"Notification sent for {job.title}")
         except Exception as e:
             print(f"Failed to send notification: {e}")

@@ -1,9 +1,12 @@
-collector/__pycache__
-app/__pycache__
-venv
-generator/.env
-database/__pycache__
-database/vacancies.db
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Database
+*.db
+
+# Specific files
 generator/current_cv.py
-generator/__pycache__
-bot/.env

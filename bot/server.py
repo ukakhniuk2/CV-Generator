@@ -1,4 +1,5 @@
 import discord
+import io
 from fastapi import FastAPI, BackgroundTasks
 from pydantic import BaseModel
 import asyncio
@@ -35,7 +36,17 @@ async def notify_vacancy(vacancy: JustJoinItVacancy, background_tasks: Backgroun
 async def send_discord_message(vacancy: JustJoinItVacancy):
     await client.wait_until_ready()
     
-    channel = client.get_channel(int(CHANNEL_ID))
+    try:
+        channel = await client.fetch_channel(int(CHANNEL_ID))
+    except discord.NotFound:
+        print(f"Error: Channel with ID {CHANNEL_ID} not found.")
+        return
+    except discord.Forbidden:
+        print(f"Error: Bot does not have permission to access channel {CHANNEL_ID}.")
+        return
+    except Exception as e:
+        print(f"Error fetching channel: {e}")
+        return
     message = (
         f"**New Job Found!**\n"
         f"**Link:** {vacancy.link}\n"
@@ -46,8 +57,10 @@ async def send_discord_message(vacancy: JustJoinItVacancy):
         f"**Cards:** {vacancy.cards}\n"
         f"**Is Remote:** {vacancy.is_remote}\n"
         f"**Is One Click:** {vacancy.is_one_click}\n"
-        f"**Description:** {vacancy.description}\n"
+        f"**Description:** {vacancy.description[:1000] + '...' if vacancy.description and len(vacancy.description) > 1000 else vacancy.description}\n"
     )
+    if len(message) > 2000:
+        message = message[:1990] + "..."
     await channel.send(message)
 
     file = discord.File(io.StringIO(vacancy.cv_code), filename="cv.txt")

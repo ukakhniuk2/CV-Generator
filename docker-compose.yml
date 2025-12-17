@@ -1,0 +1,30 @@
+services:
+  bot:
+    build: .
+    container_name: bot7_server
+    command: uvicorn bot.server:app --host 0.0.0.0 --port 8000
+    environment:
+      - PYTHONUNBUFFERED=1
+    env_file:
+      - .env
+    # Volumes if you need to persist something in bot, unlikely for now
+    restart: unless-stopped
+
+  parser:
+    build: .
+    container_name: bot7_parser
+    # Run loop: run app.py, sleep 30 min (1800s)
+    command: sh -c "sleep 60; while true; do python -m app.app; echo 'Cycle complete. Sleeping 30 minutes...'; sleep 1740; done"
+    env_file:
+      - .env
+    environment:
+      # Address of the bot service in the docker network
+      - BOT_URL=http://bot:8000
+      - PYTHONPATH=.
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Persist the database
+      - ./database:/app/database
+    depends_on:
+      - bot
+    restart: unless-stopped
