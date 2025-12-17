@@ -22,6 +22,9 @@ services:
       - BOT_URL=http://bot:8000
       - PYTHONPATH=.
       - PYTHONUNBUFFERED=1
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     volumes:
       # Persist the database
       - ./database:/app/database
