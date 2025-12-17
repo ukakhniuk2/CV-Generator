@@ -12,7 +12,7 @@ def ask_openai(vacancy):
     response = client.chat.completions.create(
         model="gpt-5-mini",
         messages=[
-            {"role": "system", "content": "You are an expert LaTeX CV writer."},
+            {"role": "system", "content": "You are an expert LaTeX CV writer. You MUST output ONLY valid, compilable LaTeX code. Do NOT use markdown code blocks (no ```). Do NOT include any introductory or concluding text. The output must start with \\documentclass and end with \\end{document}. You MUST properly escape all LaTeX special characters (like %, $, &, _, #, ^) in the content text."},
             {"role": "user", "content": f"Here is the candidate's current CV:\n{current_cv}"},
             {"role": "user", "content": f"Please adapt this CV to fit the following job description:\n{vacancy}"},
             {"role": "user", "content": f"Please keep the same style, formatting and length of the document as the current CV."},

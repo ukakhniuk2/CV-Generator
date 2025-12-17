@@ -1,5 +1,6 @@
 import discord
 import io
+from generator.latex_to_pdf import compile_latex_to_pdf
 from fastapi import FastAPI, BackgroundTasks
 from pydantic import BaseModel
 import asyncio
@@ -63,5 +64,9 @@ async def send_discord_message(vacancy: JustJoinItVacancy):
         message = message[:1990] + "..."
     await channel.send(message)
 
-    file = discord.File(io.StringIO(vacancy.cv_code), filename="cv.txt")
-    await channel.send(file=file)
+    pdf_bytes = await asyncio.to_thread(compile_latex_to_pdf, vacancy.cv_code)
+    pdf_file = discord.File(io.BytesIO(pdf_bytes), filename="cv.pdf")
+    await channel.send(file=pdf_file)
+
+    txt_file = discord.File(io.StringIO(vacancy.cv_code), filename="latex_code.txt")
+    await channel.send(file=txt_file)
