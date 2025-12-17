@@ -12,8 +12,9 @@ urls = ['https://justjoin.it/job-offers/warszawa/python?experience-level=junior&
 
 init_db()
 
+jobs = []
 for url in urls:
-    jobs = parse_job_vacancies(url)
+    jobs.extend(parse_job_vacancies(url))
 
 for job in jobs:
     if not data_exists(job.link):
