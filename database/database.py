@@ -1,7 +1,7 @@
 import sqlite3
 import json
 from typing import List, Optional
-from collector.models import JustJoinItVacancy
+from collector.models import Vacancy
 
 DB = "database/vacancies.db"
 
@@ -24,7 +24,7 @@ def init_db():
         )
         """)
 
-def save_data(vac: JustJoinItVacancy):
+def save_data(vac: Vacancy):
     with _conn() as c:
         c.execute("""
         INSERT OR IGNORE INTO vacancies

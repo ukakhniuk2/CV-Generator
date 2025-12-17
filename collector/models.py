@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 @dataclass
-class JustJoinItVacancy:
+class Vacancy:
     link: str
     title: str
     company: str

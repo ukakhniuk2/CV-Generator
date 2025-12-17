@@ -6,7 +6,7 @@ from pydantic import BaseModel
 import asyncio
 import os
 from contextlib import asynccontextmanager
-from collector.models import JustJoinItVacancy
+from collector.models import Vacancy
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -30,11 +30,11 @@ async def on_ready():
     print(f'Logged in as {client.user} (ID: {client.user.id})')
 
 @app.post("/notify")
-async def notify_vacancy(vacancy: JustJoinItVacancy, background_tasks: BackgroundTasks):
+async def notify_vacancy(vacancy: Vacancy, background_tasks: BackgroundTasks):
     background_tasks.add_task(send_discord_message, vacancy)
     return {"status": "queued"}
 
-async def send_discord_message(vacancy: JustJoinItVacancy):
+async def send_discord_message(vacancy: Vacancy):
     await client.wait_until_ready()
     
     try:
