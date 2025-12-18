@@ -4,7 +4,7 @@ import requests
 import json
 import os
 from generator.generator import ask_openai
-from database.database import init_db, save_data, data_exists
+from database.database import init_db, save_data, data_exists, delete_old_vacancies
 
 urls = ['https://justjoin.it/job-offers/warszawa/python?experience-level=junior&orderBy=DESC&sortBy=newest',
         'https://nofluffjobs.com/pl/warszawa/Python?utm_source=google&utm_medium=cpc&utm_campaign=PL_PL_srhbrand1&utm_id=12127570708&gad_source=1&gad_campaignid=12127570708&gbraid=0AAAAADJ4zV3nIRZXNCTw9hmn74kNFwCo2&gclid=Cj0KCQiAxonKBhC1ARIsAIHq_lunm2sFKicAOeCSaPat1mRvKo1NOanykhLwhhC5o58SpJEHOVNwsZAaAhN3EALw_wcB&criteria=jobLanguage%3Dpl,en,ru%20seniority%3Djunior'
@@ -33,3 +33,5 @@ for job in jobs:
             print(f"Failed to send notification: {e}")
     else:
         print(f"Already exists {job.title}")
+
+delete_old_vacancies(jobs)
