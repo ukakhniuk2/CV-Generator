@@ -16,7 +16,8 @@ def ask_openai(vacancy):
             {"role": "user", "content": f"Here is the candidate's current CV:\n{current_cv}"},
             {"role": "user", "content": f"Please adapt this CV to fit the following job description:\n{vacancy}"},
             {"role": "user", "content": f"Please keep the same style, formatting and length of the document as the current CV."},
-            {"role": "user", "content": f"It's VERY IMPORTANT, EVEN CRUCIAL to keep the same length of the document and number of lines in one topic as the current CV, everything should be in one page."}
+            {"role": "user", "content": f"It's VERY IMPORTANT, EVEN CRUCIAL to keep the same length of the document and number of lines in one topic as the current CV, everything should be in one page."},
+            {"role": "user", "content": f"Output all text ONLY in english language."}
         ]
     )
 

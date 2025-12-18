@@ -71,7 +71,9 @@ def parse_NoFluffJobs_vacancy_description(vacancy_url):
     response = requests.get(vacancy_url)
     soup = BeautifulSoup(response.text, 'html.parser')
     description = soup.find('section', id='posting-description').text.strip()
-    return description
+    requirements = soup.find('div', id='posting-requirements').text.strip()
+    requirements2 = soup.find('section', {'data-cy-section': 'JobOffer_Requirements'}).text.strip()
+    return requirements + "\n\n" + requirements2 + "\n\n" + description
 
 def parse_job_vacancies(url):
     if "justjoin.it" in url:
