@@ -12,3 +12,4 @@ class Vacancy:
     is_one_click: bool
     description: str | None
     cv_code: str | None
+    cover_letter: str | None

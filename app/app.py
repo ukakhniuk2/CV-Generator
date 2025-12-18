@@ -1,9 +1,8 @@
 from collector.parser import parse_job_vacancies, parse_job_vacancy_description
 from dataclasses import asdict
 import requests
-import json
 import os
-from generator.generator import ask_openai
+from generator.generator import ask_openai, ask_openai_cover_letter
 from database.database import init_db, save_data, data_exists, delete_old_vacancies
 
 urls = ['https://justjoin.it/job-offers/warszawa/python?experience-level=junior&orderBy=DESC&sortBy=newest',
@@ -20,7 +19,9 @@ for job in jobs:
     if not data_exists(job.link):
         job.description = parse_job_vacancy_description(job.link)
         cv_code = ask_openai(job)
+        cover_letter = ask_openai_cover_letter(job, cv_code)
         job.cv_code = cv_code
+        job.cover_letter = cover_letter
         save_data(job)
         print(f"Saved {job.title}")
 

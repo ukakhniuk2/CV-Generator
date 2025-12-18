@@ -27,7 +27,8 @@ def parse_JustJoinIt(url):
             is_remote = remote_badge is not None,
             is_one_click = '1-click Apply' in list(dict.fromkeys([skill.text.strip() for skill in card.find_all('div', class_='mui-jikuwi') if skill.text.strip()])),
             description = None,
-            cv_code = None
+            cv_code = None,
+            cover_letter = None
         )
         jobs.append(job)
     return jobs
@@ -62,7 +63,8 @@ def parse_NoFluffJobs(url):
             is_remote = 'Remote' in location,
             is_one_click = False,
             description = None,
-            cv_code = None
+            cv_code = None,
+            cover_letter = None
         )
         jobs.append(job)
     return jobs

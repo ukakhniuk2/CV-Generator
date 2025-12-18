@@ -23,3 +23,18 @@ def ask_openai(vacancy):
 
     adapted_cv = response.choices[0].message.content
     return adapted_cv
+
+def ask_openai_cover_letter(vacancy, cv):
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+    response = client.chat.completions.create(
+        model="gpt-5-mini",
+        messages=[
+            {"role": "system", "content": "You are an expert cover letter writer. You creating cover letters for job applications. It should be personalized for a vacancy and candidate's CV. It should contain 5-7 sentences about how candidate's experience and skills match the job description, how candidate can be a good fit for the company and how candidate excited to work for the company. Write from the candidate's perspective."},
+            {"role": "user", "content": f"Here is the candidate's current CV:\n{cv}"},
+            {"role": "user", "content": f"Please adapt this CV to fit the following job description:\n{vacancy}"}
+        ]
+    )
+
+    cover_letter = response.choices[0].message.content
+    return cover_letter
