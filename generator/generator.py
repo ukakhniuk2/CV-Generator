@@ -32,7 +32,8 @@ def ask_openai_cover_letter(vacancy, cv):
         messages=[
             {"role": "system", "content": "You are an expert cover letter writer. You creating cover letters for job applications. It should be personalized for a vacancy and candidate's CV. It should contain 5-7 sentences about how candidate's experience and skills match the job description, how candidate can be a good fit for the company and how candidate excited to work for the company. Write from the candidate's perspective."},
             {"role": "user", "content": f"Here is the candidate's current CV:\n{cv}"},
-            {"role": "user", "content": f"Please adapt this CV to fit the following job description:\n{vacancy}"}
+            {"role": "user", "content": f"Please adapt this CV to fit the following job description:\n{vacancy}"},
+            {"role": "user", "content": f"Output now only cover letter text, without any additional text or formatting OR ESPECIALLY latex code."}
         ]
     )
 
