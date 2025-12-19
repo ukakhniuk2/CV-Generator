@@ -7,8 +7,7 @@ from database.database import init_db, save_data, data_exists, delete_old_vacanc
 
 urls = ['https://justjoin.it/job-offers/warszawa/python?experience-level=junior&orderBy=DESC&sortBy=newest', #python, junior, Warszawa
         'https://justjoin.it/job-offers/remote/python?experience-level=junior&orderBy=DESC&sortBy=newest', #python, junior, Remote
-        'https://nofluffjobs.com/pl/warszawa/Python?utm_source=google&utm_medium=cpc&utm_campaign=PL_PL_srhbrand1&utm_id=12127570708&gad_source=1&gad_campaignid=12127570708&gbraid=0AAAAADJ4zV3nIRZXNCTw9hmn74kNFwCo2&gclid=Cj0KCQiAxonKBhC1ARIsAIHq_lunm2sFKicAOeCSaPat1mRvKo1NOanykhLwhhC5o58SpJEHOVNwsZAaAhN3EALw_wcB&criteria=jobLanguage%3Dpl,en,ru%20seniority%3Djunior', #python, junior, Warszawa
-        'https://nofluffjobs.com/pl/praca-zdalna/Python?utm_source=google&utm_medium=cpc&utm_campaign=PL_PL_srhbrand1&utm_id=12127570708&gad_source=1&gad_campaignid=12127570708&gbraid=0AAAAADJ4zV3nIRZXNCTw9hmn74kNFwCo2&gclid=Cj0KCQiAxonKBhC1ARIsAIHq_lunm2sFKicAOeCSaPat1mRvKo1NOanykhLwhhC5o58SpJEHOVNwsZAaAhN3EALw_wcB&criteria=jobLanguage%3Dpl,en,ru%20seniority%3Djunior', #python, junior, Remote
+        'https://nofluffjobs.com/pl/praca-zdalna/Python?utm_source=google&utm_medium=cpc&utm_campaign=PL_PL_srhbrand1&utm_id=12127570708&gad_source=1&gad_campaignid=12127570708&gbraid=0AAAAADJ4zV3nIRZXNCTw9hmn74kNFwCo2&gclid=Cj0KCQiAxonKBhC1ARIsAIHq_lunm2sFKicAOeCSaPat1mRvKo1NOanykhLwhhC5o58SpJEHOVNwsZAaAhN3EALw_wcB&criteria=city%3Dwarszawa%20%20jobLanguage%3Dpl,en,ru%20seniority%3Djunior', #python, junior, Warszawa or remote
         'https://theprotocol.it/filtry/python;t/junior;p/warszawa;wp?sort=date', #python, junior, Warszawa
         'https://theprotocol.it/filtry/python;t/junior;p/zdalna;rw?sort=date', #python, junior, Remote
         'https://bulldogjob.pl/companies/jobs/s/skills,Python/experienceLevel,junior/city,Warszawa', #python, junior, Warszawa
