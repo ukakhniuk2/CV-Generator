@@ -164,6 +164,87 @@ def parse_theProtocolIt(url):
         jobs.append(job)
     return jobs
 
+def parse_BulldogJob(url):
+    #TODO: vibecoded, review it
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    
+    next_data_script = soup.find('script', id='__NEXT_DATA__')
+    if not next_data_script:
+        return []
+    
+    try:
+        data = json.loads(next_data_script.string)
+        jobs_data = data['props']['pageProps']['jobs']
+    except (KeyError, json.JSONDecodeError, TypeError):
+        return []
+
+    jobs = []
+    for job_data in jobs_data:
+        salary_data = job_data.get('denominatedSalaryLong')
+        salary = "Undisclosed"
+        if salary_data and not salary_data.get('hidden'):
+            money = salary_data.get('money', '')
+            currency = salary_data.get('currency', '')
+            salary = f"{money} {currency}"
+        
+        job = Vacancy(
+            link = "https://bulldogjob.pl/companies/jobs/" + job_data.get('id', ''),
+            title = job_data.get('position', 'N/A'),
+            company = job_data.get('company', {}).get('name', 'N/A'),
+            location = job_data.get('city', 'N/A'),
+            salary = salary,
+            cards = job_data.get('technologyTags', []),
+            is_remote = job_data.get('remote', False),
+            is_one_click = False,
+            description = None,
+            cv_code = None,
+            cover_letter = None
+        )
+        jobs.append(job)
+    return jobs
+
+def parse_BulldogJob_vacancy_description(vacancy_url):
+    #TODO: vibecoded, review it
+    response = requests.get(vacancy_url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    
+    next_data_script = soup.find('script', id='__NEXT_DATA__')
+    if next_data_script:
+        try:
+            data = json.loads(next_data_script.string)
+            
+            # Deep search for 'job' object
+            def find_key(obj, key):
+                if isinstance(obj, dict):
+                    if key in obj:
+                        return obj[key]
+                    for k, v in obj.items():
+                        result = find_key(v, key)
+                        if result:
+                            return result
+                elif isinstance(obj, list):
+                    for item in obj:
+                        result = find_key(item, key)
+                        if result:
+                            return result
+                return None
+
+            job_details = find_key(data, 'job')
+            if job_details:
+                desc_html = job_details.get('details') or job_details.get('description')
+                if desc_html:
+                    desc_soup = BeautifulSoup(desc_html, 'html.parser')
+                    return desc_soup.get_text(separator='\n').strip()
+        except (KeyError, json.JSONDecodeError, TypeError):
+            pass
+
+    description_elem = soup.find('div', id='job-description')
+    if description_elem:
+        return description_elem.get_text(separator='\n').strip()
+        
+    return "Description not found."
+
 def parse_theProtocolIt_vacancy_description(vacancy_url):
     #TODO: review it better cause it vibecoded and might be shitty
     html = get_page_content_with_browser(vacancy_url)
@@ -228,6 +309,8 @@ def parse_job_vacancies(url):
         return parse_NoFluffJobs(url)
     elif "theprotocol.it" in url:
         return parse_theProtocolIt(url)
+    elif "bulldogjob.pl" in url:
+        return parse_BulldogJob(url)
     else:
         raise ValueError("Unsupported URL")
 
@@ -238,5 +321,7 @@ def parse_job_vacancy_description(url):
         return parse_NoFluffJobs_vacancy_description(url)
     elif "theprotocol.it" in url:
         return parse_theProtocolIt_vacancy_description(url)
+    elif "bulldogjob.pl" in url:
+        return parse_BulldogJob_vacancy_description(url)
     else:
         raise ValueError("Unsupported URL")

@@ -23,14 +23,14 @@ for job in jobs:
         #cover_letter = ask_openai_cover_letter(job, cv_code)
         job.cv_code = cv_code
         #job.cover_letter = cover_letter
-        save_data(job)
-        print(f"Saved {job.title}")
 
         # Send notification to Discord Bot
         try:
             bot_url = os.getenv("BOT_URL")
             requests.post(f"{bot_url}/notify", json=asdict(job))
             print(f"Notification sent for {job.title}")
+            save_data(job)
+            print(f"Saved {job.title}")
         except Exception as e:
             print(f"Failed to send notification: {e}")
     else:
