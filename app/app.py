@@ -20,9 +20,9 @@ for job in jobs:
     if not data_exists(job.link):
         job.description = parse_job_vacancy_description(job.link)
         cv_code = ask_openai(job)
-        cover_letter = ask_openai_cover_letter(job, cv_code)
+        #cover_letter = ask_openai_cover_letter(job, cv_code)
         job.cv_code = cv_code
-        job.cover_letter = cover_letter
+        #job.cover_letter = cover_letter
         save_data(job)
         print(f"Saved {job.title}")
 

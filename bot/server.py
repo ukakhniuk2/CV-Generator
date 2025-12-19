@@ -71,6 +71,6 @@ async def send_discord_message(vacancy: Vacancy):
     txt_file = discord.File(io.StringIO(vacancy.cv_code), filename="latex_code.txt")
     await channel.send(file=txt_file)
 
-    cover_letter_file = discord.File(io.StringIO(vacancy.cover_letter), filename="cover_letter.txt")
-    await channel.send(file=cover_letter_file)
+    # cover_letter_file = discord.File(io.StringIO(vacancy.cover_letter), filename="cover_letter.txt")
+    # await channel.send(file=cover_letter_file)
     
