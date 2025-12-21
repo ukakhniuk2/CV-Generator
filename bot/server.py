@@ -8,6 +8,9 @@ import os
 from contextlib import asynccontextmanager
 from collector.models import Vacancy
 from dotenv import load_dotenv
+from discord.ext import commands
+import json
+from pathlib import Path
 
 load_dotenv()
 
@@ -15,19 +18,70 @@ DISCORD_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
 CHANNEL_ID = os.getenv("DISCORD_CHANNEL_ID")
 
 intents = discord.Intents.default()
-client = discord.Client(intents=intents)
+intents.message_content = True # Required for reading commands
+bot = commands.Bot(command_prefix="/", intents=intents)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    asyncio.create_task(client.start(DISCORD_TOKEN))
+    asyncio.create_task(bot.start(DISCORD_TOKEN))
     yield
-    await client.close()
+    await bot.close()
 
 app = FastAPI(lifespan=lifespan)
 
-@client.event
+@bot.event
 async def on_ready():
-    print(f'Logged in as {client.user} (ID: {client.user.id})')
+    print(f'Logged in as {bot.user} (ID: {bot.user.id})')
+
+@bot.command(name="url_add")
+async def url_add(ctx, url: str):
+    json_path = Path(__file__).parent.parent / "urls.json"
+    
+    urls = []
+    if os.path.exists(json_path):
+        try:
+            with open(json_path, 'r') as f:
+                urls = json.load(f)
+        except json.JSONDecodeError:
+            urls = []
+
+    if url not in urls:
+        urls.append(url)
+        with open(json_path, 'w') as f:
+            json.dump(urls, f, indent=4)
+        await ctx.send(f"URL added: {url}")
+    else:
+        await ctx.send(f"URL already exists: {url}")
+
+@bot.command(name="urls_show")
+async def urls_show(ctx):
+    json_path = Path(__file__).parent.parent / "urls.json"
+    
+    if not json_path.exists():
+        await ctx.send("No URLs found. `urls.json` does not exist.")
+        return
+
+    try:
+        with open(json_path, 'r') as f:
+            urls = json.load(f)
+    except (json.JSONDecodeError, Exception) as e:
+        await ctx.send(f"Error reading `urls.json`: {e}")
+        return
+
+    if not urls:
+        await ctx.send("The URL list is empty.")
+        return
+
+    message = "**Currently tracked URLs:**\n"
+    for i, url in enumerate(urls, 1):
+        line = f"{i}. {url}\n"
+        if len(message) + len(line) > 1900:
+            await ctx.send(message)
+            message = ""
+        message += line
+    
+    if message:
+        await ctx.send(message)
 
 @app.post("/notify")
 async def notify_vacancy(vacancy: Vacancy, background_tasks: BackgroundTasks):
@@ -35,10 +89,10 @@ async def notify_vacancy(vacancy: Vacancy, background_tasks: BackgroundTasks):
     return {"status": "queued"}
 
 async def send_discord_message(vacancy: Vacancy):
-    await client.wait_until_ready()
+    await bot.wait_until_ready()
     
     try:
-        channel = await client.fetch_channel(int(CHANNEL_ID))
+        channel = await bot.fetch_channel(int(CHANNEL_ID))
     except discord.NotFound:
         print(f"Error: Channel with ID {CHANNEL_ID} not found.")
         return
