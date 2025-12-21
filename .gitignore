@@ -10,3 +10,4 @@ venv/
 
 # Specific files
 generator/current_cv.py
+urls.json
