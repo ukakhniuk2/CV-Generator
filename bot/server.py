@@ -83,6 +83,38 @@ async def urls_show(ctx):
     if message:
         await ctx.send(message)
 
+@bot.command(name="url_remove")
+async def url_remove(ctx, index: int):
+    json_path = Path(__file__).parent.parent / "urls.json"
+    
+    if not json_path.exists():
+        await ctx.send("No URLs found. `urls.json` does not exist.")
+        return
+
+    try:
+        with open(json_path, 'r') as f:
+            urls = json.load(f)
+    except (json.JSONDecodeError, Exception) as e:
+        await ctx.send(f"Error reading `urls.json`: {e}")
+        return
+
+    if not urls:
+        await ctx.send("The URL list is empty.")
+        return
+
+    if index < 1 or index > len(urls):
+        await ctx.send(f"Invalid index. Please provide a number between 1 and {len(urls)}.")
+        return
+
+    removed_url = urls.pop(index - 1)
+    
+    try:
+        with open(json_path, 'w') as f:
+            json.dump(urls, f, indent=4)
+        await ctx.send(f"Removed URL: {removed_url}")
+    except Exception as e:
+        await ctx.send(f"Error saving `urls.json`: {e}")
+
 @app.post("/notify")
 async def notify_vacancy(vacancy: Vacancy, background_tasks: BackgroundTasks):
     background_tasks.add_task(send_discord_message, vacancy)

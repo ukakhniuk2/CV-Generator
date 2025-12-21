@@ -15,6 +15,8 @@ if json_path.exists():
 else:
     print(f"Warning: {json_path} not found.")
 
+print(f"Tracked urls: {urls}")
+
 init_db()
 
 jobs = []
