@@ -7,7 +7,8 @@ services:
       - PYTHONUNBUFFERED=1
     env_file:
       - .env
-    # Volumes if you need to persist something in bot, unlikely for now
+    volumes:
+      - ./urls.json:/app/urls.json
     restart: unless-stopped
 
   parser:
@@ -26,8 +27,9 @@ services:
       - 8.8.8.8
       - 1.1.1.1
     volumes:
-      # Persist the database
+      # Persist the database and urls
       - ./database:/app/database
+      - ./urls.json:/app/urls.json
     depends_on:
       - bot
     restart: unless-stopped
