@@ -34,10 +34,14 @@ app = FastAPI(lifespan=lifespan)
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user} (ID: {bot.user.id})')
+    try:
+        synced = await bot.tree.sync()
+        print(f"Synced {len(synced)} command(s)")
+    except Exception as e:
+        print(f"Error syncing commands: {e}")
 
-@bot.command(name="url_add")
-async def url_add(ctx, url: str):
-    """Adds a new job search URL."""
+@bot.tree.command(name="url_add", description="Adds a new job search URL.")
+async def url_add(interaction: discord.Interaction, url: str):
     json_path = Path(__file__).parent.parent / "urls.json"
     
     urls = []
@@ -52,63 +56,61 @@ async def url_add(ctx, url: str):
         urls.append(url)
         with open(json_path, 'w') as f:
             json.dump(urls, f, indent=4)
-        await ctx.send(f"URL added: {url}")
+        await interaction.response.send_message(f"URL added: {url}")
     else:
-        await ctx.send(f"URL already exists: {url}")
+        await interaction.response.send_message(f"URL already exists: {url}")
 
-@bot.command(name="urls_show")
-async def urls_show(ctx):
-    """Shows all currently tracked URLs."""
+@bot.tree.command(name="urls_show", description="Shows all currently tracked URLs.")
+async def urls_show(interaction: discord.Interaction):
     json_path = Path(__file__).parent.parent / "urls.json"
     
     if not json_path.exists():
-        await ctx.send("No URLs found. `urls.json` does not exist.")
+        await interaction.response.send_message("No URLs found. `urls.json` does not exist.")
         return
 
     try:
         with open(json_path, 'r') as f:
             urls = json.load(f)
     except (json.JSONDecodeError, Exception) as e:
-        await ctx.send(f"Error reading `urls.json`: {e}")
+        await interaction.response.send_message(f"Error reading `urls.json`: {e}")
         return
 
     if not urls:
-        await ctx.send("The URL list is empty.")
+        await interaction.response.send_message("The URL list is empty.")
         return
 
     message = "**Currently tracked URLs:**\n"
     for i, url in enumerate(urls, 1):
         line = f"{i}. {url}\n"
         if len(message) + len(line) > 1900:
-            await ctx.send(message)
+            await interaction.response.send_message(message)
             message = ""
         message += line
     
     if message:
-        await ctx.send(message)
+        await interaction.response.send_message(message)
 
-@bot.command(name="url_remove")
-async def url_remove(ctx, index: int):
-    """Removes a URL from the list by its index."""
+@bot.tree.command(name="url_remove", description="Removes a URL from the list by its index.")
+async def url_remove(interaction: discord.Interaction, index: int):
     json_path = Path(__file__).parent.parent / "urls.json"
     
     if not json_path.exists():
-        await ctx.send("No URLs found. `urls.json` does not exist.")
+        await interaction.response.send_message("No URLs found. `urls.json` does not exist.")
         return
 
     try:
         with open(json_path, 'r') as f:
             urls = json.load(f)
     except (json.JSONDecodeError, Exception) as e:
-        await ctx.send(f"Error reading `urls.json`: {e}")
+        await interaction.response.send_message(f"Error reading `urls.json`: {e}")
         return
 
     if not urls:
-        await ctx.send("The URL list is empty.")
+        await interaction.response.send_message("The URL list is empty.")
         return
 
     if index < 1 or index > len(urls):
-        await ctx.send(f"Invalid index. Please provide a number between 1 and {len(urls)}.")
+        await interaction.response.send_message(f"Invalid index. Please provide a number between 1 and {len(urls)}.")
         return
 
     removed_url = urls.pop(index - 1)
@@ -116,18 +118,18 @@ async def url_remove(ctx, index: int):
     try:
         with open(json_path, 'w') as f:
             json.dump(urls, f, indent=4)
-        await ctx.send(f"Removed URL: {removed_url}")
+        await interaction.response.send_message(f"Removed URL: {removed_url}")
     except Exception as e:
-        await ctx.send(f"Error saving `urls.json`: {e}")
+        await interaction.response.send_message(f"Error saving `urls.json`: {e}")
 
-@bot.command(name="cv")
-async def generate_cv(ctx, url: str):
-    """Generates a CV for a specific job vacancy URL."""
-    await ctx.send(f"⏳ Generating CV for: {url}\nThis may take up to a minute...")
+@bot.tree.command(name="cv", description="Generates a CV for a specific job vacancy URL.")
+async def generate_cv(interaction: discord.Interaction, url: str):
+    # Important for slash commands: generation takes time, so we must defer
+    await interaction.response.defer()
     
     try:
         description = await asyncio.to_thread(parse_job_vacancy_description, url)
-        
+
         temp_vacancy = Vacancy(
             link=url,
             title="Requested via command",
@@ -144,12 +146,15 @@ async def generate_cv(ctx, url: str):
 
         cv_code = await asyncio.to_thread(ask_openai, temp_vacancy)
         pdf_bytes = await asyncio.to_thread(compile_latex_to_pdf, cv_code)
+        
         pdf_file = discord.File(io.BytesIO(pdf_bytes), filename="cv.pdf")
-        await ctx.send(content="**CV is ready!**", file=pdf_file)
+        await interaction.followup.send(content="CV is ready!", file=pdf_file)
+        
         txt_file = discord.File(io.StringIO(cv_code), filename="latex_code.txt")
-        await ctx.send(file=txt_file)
+        await interaction.followup.send(file=txt_file)
+
     except Exception as e:
-        await ctx.send(f"An error occurred: {str(e)}")
+        await interaction.followup.send(f"An error occurred: {str(e)}")
 
 @app.post("/notify")
 async def notify_vacancy(vacancy: Vacancy, background_tasks: BackgroundTasks):
