@@ -8,6 +8,8 @@ import os
 from contextlib import asynccontextmanager
 from collector.models import Vacancy
 from dotenv import load_dotenv
+from discord.ext import commands
+import json
 from pathlib import Path
 from collector.parser import parse_job_vacancy_description
 from generator.generator import ask_openai
