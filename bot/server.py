@@ -8,9 +8,9 @@ import os
 from contextlib import asynccontextmanager
 from collector.models import Vacancy
 from dotenv import load_dotenv
-from discord.ext import commands
-import json
 from pathlib import Path
+from collector.parser import parse_job_vacancy_description
+from generator.generator import ask_openai
 
 load_dotenv()
 
@@ -35,6 +35,7 @@ async def on_ready():
 
 @bot.command(name="url_add")
 async def url_add(ctx, url: str):
+    """Adds a new job search URL."""
     json_path = Path(__file__).parent.parent / "urls.json"
     
     urls = []
@@ -55,6 +56,7 @@ async def url_add(ctx, url: str):
 
 @bot.command(name="urls_show")
 async def urls_show(ctx):
+    """Shows all currently tracked URLs."""
     json_path = Path(__file__).parent.parent / "urls.json"
     
     if not json_path.exists():
@@ -85,6 +87,7 @@ async def urls_show(ctx):
 
 @bot.command(name="url_remove")
 async def url_remove(ctx, index: int):
+    """Removes a URL from the list by its index."""
     json_path = Path(__file__).parent.parent / "urls.json"
     
     if not json_path.exists():
@@ -114,6 +117,37 @@ async def url_remove(ctx, index: int):
         await ctx.send(f"Removed URL: {removed_url}")
     except Exception as e:
         await ctx.send(f"Error saving `urls.json`: {e}")
+
+@bot.command(name="cv")
+async def generate_cv(ctx, url: str):
+    """Generates a CV for a specific job vacancy URL."""
+    await ctx.send(f"⏳ Generating CV for: {url}\nThis may take up to a minute...")
+    
+    try:
+        description = await asyncio.to_thread(parse_job_vacancy_description, url)
+        
+        temp_vacancy = Vacancy(
+            link=url,
+            title="Requested via command",
+            company="Unknown",
+            location="N/A",
+            salary="N/A",
+            cards=[],
+            is_remote=False,
+            is_one_click=False,
+            description=description,
+            cv_code=None,
+            cover_letter=None
+        )
+
+        cv_code = await asyncio.to_thread(ask_openai, temp_vacancy)
+        pdf_bytes = await asyncio.to_thread(compile_latex_to_pdf, cv_code)
+        pdf_file = discord.File(io.BytesIO(pdf_bytes), filename="cv.pdf")
+        await ctx.send(content="**CV is ready!**", file=pdf_file)
+        txt_file = discord.File(io.StringIO(cv_code), filename="latex_code.txt")
+        await ctx.send(file=txt_file)
+    except Exception as e:
+        await ctx.send(f"An error occurred: {str(e)}")
 
 @app.post("/notify")
 async def notify_vacancy(vacancy: Vacancy, background_tasks: BackgroundTasks):
