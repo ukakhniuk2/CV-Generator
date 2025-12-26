@@ -124,7 +124,7 @@ Passionate about learning, experimenting with GenAI tools, and writing clean, ef
 \vspace{8pt}
 
 \subsection*{Lionbridge \hfill May 2022 -- September 2024 (3 Years)}
-\textit{Test Analyst}
+\textit{QA Engineer}
 \begin{itemize}
   \item Designed and documented detailed test cases and tasks, ensuring comprehensive coverage.  
   \item Coordinated testing efforts and monitored progress to ensure efficient QA execution.  

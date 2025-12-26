@@ -43,4 +43,4 @@ for job in jobs:
     else:
         print(f"Already exists {job.title}")
 
-delete_old_vacancies(jobs)
+# delete_old_vacancies(jobs)

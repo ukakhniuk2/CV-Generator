@@ -52,6 +52,7 @@ docker-compose up -d --build
 ## Project Structure
 - `app/`: Main parser logic.
 - `bot/`: FastAPI server and Discord bot.
+- `collector/`: Functions for job vacancy parsing.
 - `generator/`: Logic for CV generation (OpenAI) and PDF conversion (LaTeX).
 - `database/`: SQLite database storage.
 
