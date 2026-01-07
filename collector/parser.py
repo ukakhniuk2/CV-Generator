@@ -102,12 +102,19 @@ def parse_NoFluffJobs(url):
     return jobs
 
 def parse_NoFluffJobs_vacancy_description(vacancy_url):
-    response = requests.get(vacancy_url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    description = soup.find('section', id='posting-description').text.strip()
-    requirements = soup.find('div', id='posting-requirements').text.strip()
-    requirements2 = soup.find('section', {'data-cy-section': 'JobOffer_Requirements'}).text.strip()
-    return requirements + "\n\n" + requirements2 + "\n\n" + description
+    html = get_page_content_with_browser(vacancy_url)
+    soup = BeautifulSoup(html, 'html.parser')
+    
+    description_elem = soup.find('section', id='posting-description')
+    requirements_elem = soup.find('div', id='posting-requirements')
+    requirements2_elem = soup.find('section', {'data-cy-section': 'JobOffer_Requirements'})
+    
+    description = description_elem.text.strip() if description_elem else ""
+    requirements = requirements_elem.text.strip() if requirements_elem else ""
+    requirements2 = requirements2_elem.text.strip() if requirements2_elem else ""
+    
+    result = "\n\n".join(filter(None, [requirements, requirements2, description]))
+    return result
 
 def parse_theProtocolIt(url):
     #TODO: review it better cause it vibecoded and might be shitty
