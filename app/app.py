@@ -21,11 +21,19 @@ init_db()
 
 jobs = []
 for url in urls:
-    jobs.extend(parse_job_vacancies(url))
+    try:
+        jobs.extend(parse_job_vacancies(url))
+    except Exception as e:
+        print(f"Failed to parse vacancies for {url}: {e}")
+        continue
 
 for job in jobs:
     if not data_exists(job.link):
-        job.description = parse_job_vacancy_description(job.link)
+        try:
+            job.description = parse_job_vacancy_description(job.link)
+        except Exception as e:
+            print(f"Failed to parse description for {job.title}: {e}")
+            continue
         cv_code = ask_openai(job)
         #cover_letter = ask_openai_cover_letter(job, cv_code)
         job.cv_code = cv_code
